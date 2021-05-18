@@ -1,11 +1,13 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {createTransaction} from "../utils/transactions";
 import {AppContext} from "../appContext";
 import {Buffer} from "@liskhq/lisk-client";
+import {useBlocks} from "./blocks";
 
 export const useAuth = (closeModal) => {
   const {getClient} = useContext(AppContext);
   const [account, setAccount] = useState();
+  const {height} = useBlocks()
   const [loadingSprinkler, setLoadingSprinkler] = useState(false);
   const [registerError, setRegisterError] = useState();
 
@@ -18,6 +20,17 @@ export const useAuth = (closeModal) => {
     }
     checkLogin();
   }
+
+  useEffect(() => {
+    const updateAccount = async () => {
+      const client = await getClient;
+      const foundAccount = await client.account.get(Buffer.from(account.address, 'hex'))
+      setAccount({...account, name: foundAccount.sprinkler.username, chain: foundAccount})
+    }
+    if (account) {
+      updateAccount()
+    }
+  }, [height])
 
   const onRegister = (account) => {
     const doSprinkler = async () => {

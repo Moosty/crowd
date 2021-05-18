@@ -37,7 +37,7 @@ export const Home = ({account, setModal, filters, visible}) => {
     setModal({
       type: "transactionConfirm",
       address: account.address,
-      name: account.username,
+      name: account?.chain?.sprinkler?.username,
       transactionType: "crowd:back",
       fee: `${fee} LSK`,
       ctaButton: {
@@ -89,21 +89,23 @@ export const Home = ({account, setModal, filters, visible}) => {
   return <div>
     {!visible &&
     <Container className={["space-x-4", "space-y-4", "flex", "flex-wrap", "flex-row", "my-20"].join(" ")}>
-      {projects && projects.filter(project => project.state === crowdFundStates.PREVIEW || project.state === crowdFundStates.OPEN).map((project, i) =>
-        <div key={project.id} className={i === 0 && "ml-5 mt-4"}>
+      {projects && projects.filter(project => project.state === crowdFundStates.PREVIEW || project.state === crowdFundStates.OPEN).map((project, i) => {
+        const time = project.start > height ? <span>soon&trade;</span> : "until funded"
+        return <div key={project.id} className={i === 0 && "ml-5 mt-4"}>
           <CrowdCardContainer
             {...project}
+            time={time}
             backOnClick={() => account ? setModal({
-              type: "back",
-              project: {
-                ...project,
-                onClickBack: (amount) => onBack(amount.target.value, project)
-              },
-            }) :
-            setModal('login')}
+                type: "back",
+                project: {
+                  ...project,
+                  onClickBack: (amount) => onBack(amount.target.value, project)
+                },
+              }) :
+              setModal('login')}
             height={height}/>
         </div>
-      )}
+      })}
     </Container>}
     {visible && <Container className={["my-20"].join(" ")}>
       <AccountProjectList>

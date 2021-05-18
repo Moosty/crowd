@@ -14,11 +14,15 @@ export const votingPassed = (crowdfund, period) => {
     totalWeight += BigInt(backer.amount)
   })
   let cancelVotes = BigInt(0)
-  crowdfund.votes.find(v => v.period === period).votes.map(v => {
-    if (!v.vote) {
-      cancelVotes += backers.find(b => b.backer.equals(v.backer)).amount;
-    }
-  })
+    const periodVotes = crowdfund.votes.find(v => v.period === period);
+  console.log(periodVotes)
+  if (periodVotes) {
+    periodVotes.votes.map(v => {
+      if (!v.vote) {
+        cancelVotes += backers.find(b => b.backer.equals(v.backer)).amount;
+      }
+    })
+  }
   return totalWeight / BigInt(2) >= cancelVotes;
 }
 

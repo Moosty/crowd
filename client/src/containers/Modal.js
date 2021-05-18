@@ -77,7 +77,14 @@ export const ModalContainer = ({currentOpen, setCurrentOpen, externalError, ctaL
     onClose={() => setCurrentOpen(null)}
 
   >
-    {(currentOpen?.type !== 'back' && currentOpen?.type !== 'claim' && currentOpen?.type !== 'registerStart' && currentOpen?.type !== 'vote' ) && <ModalTemplate
+    {(
+      currentOpen?.type !== 'back' &&
+      currentOpen?.type !== 'claim' &&
+      currentOpen?.type !== 'registerStart' &&
+      currentOpen?.type !== 'refund' &&
+      currentOpen?.type !== 'cancel' &&
+      currentOpen?.type !== 'vote'
+    ) && <ModalTemplate
       cancelLabel={cancelLabel}
       ctaButton={(currentOpen === 'login' || currentOpen === 'register' || currentOpen?.type === "transactionConfirm") && {
         disabled: disabledCTA || ctaLoading,
@@ -134,7 +141,14 @@ export const ModalContainer = ({currentOpen, setCurrentOpen, externalError, ctaL
     />}
 
     </ModalTemplate>}
-    {(currentOpen?.type === 'back' || currentOpen?.type === 'claim' || currentOpen?.type === 'vote' || currentOpen?.type === 'registerStart') && <BackProjectModal
+    {(
+      currentOpen?.type === 'back' ||
+      currentOpen?.type === 'claim' ||
+      currentOpen?.type === 'vote' ||
+      currentOpen?.type === 'refund' ||
+      currentOpen?.type === 'cancel' ||
+      currentOpen?.type === 'registerStart'
+    ) && <BackProjectModal
       {...currentOpen.project}
       iconCancel
       onClose={() => setCurrentOpen(null)}
@@ -142,6 +156,8 @@ export const ModalContainer = ({currentOpen, setCurrentOpen, externalError, ctaL
       register={currentOpen?.type === 'registerStart'}
       vote={currentOpen?.type === 'vote'}
       claim={currentOpen?.type === 'claim'}
+      refund={currentOpen?.type === 'refund'}
+      cancel={currentOpen?.type === 'cancel'}
     />}
   </Modal>
 }

@@ -25,7 +25,10 @@ export const Explore = ({account, setModal, filters, visible}) => {
    <Container className={[ "my-20"].join(" ")}>
       <AccountProjectList>
         {projects && projects.filter(project => project.state === crowdFundStates.PENDING || project.state === crowdFundStates.ACTIVE.ACTIVE || project.state === crowdFundStates.ACTIVE.PENDING || project.state === crowdFundStates.ACTIVE.CLAIMING || project.state === crowdFundStates.ACTIVE.VOTING).map((project) =>
-          <AccountProjectSingleItem {...project}/>
+          <AccountProjectSingleItem
+            {...project}
+            gradient
+          />
         )}
       </AccountProjectList>
     </Container>

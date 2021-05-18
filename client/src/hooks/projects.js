@@ -4,9 +4,11 @@ import {transactions} from '@liskhq/lisk-client'
 import {useBlocks} from "./blocks";
 import {AppContext} from "../appContext";
 import {crowdFundStates, PROJECT_LIFECYCLE} from "@moosty/dao-storybook/dist/shared/global.crowdfund";
+import {useMembers} from "./members";
 
 export const useProjects = () => {
   const {getClient} = useContext(AppContext);
+  const {members} = useMembers();
   const {height} = useBlocks();
   const [projects, setProjects] = useState();
 
@@ -16,9 +18,11 @@ export const useProjects = () => {
       const chainData = await client.invoke("crowd:getAllCrowdfunds", {limit: 100000, offset: 0});
       if (chainData?.meta?.count > 0) {
         setProjects(chainData.data.map(item => {
+          const owner = members?.find(m => m.id === item.owner);
           return {
             ...item,
             ...getState(item),
+            owner: {...owner, username: owner?.name},
             durationProject: item.periods,
             targetAmount: parseInt(transactions.convertBeddowsToLSK(item.goal)),
             totalRaised: parseInt(transactions.convertBeddowsToLSK(item.backers.reduce((sum, backer) => sum + BigInt(backer?.amount), BigInt(0)).toString())),
@@ -30,7 +34,7 @@ export const useProjects = () => {
       }
     }
     getProjects()
-  }, [height])
+  }, [height, members])
 
   const getState = (project) => {
     const state = project.state.toLowerCase();

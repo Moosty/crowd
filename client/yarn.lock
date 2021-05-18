@@ -1674,10 +1674,10 @@
     semver "7.1.3"
     validator "12.2.0"
 
-"@moosty/dao-storybook@^0.1.63":
-  version "0.1.63"
-  resolved "https://npm.pkg.github.com/download/@moosty/dao-storybook/0.1.63/e2b1c6d40584c186cfd2c2649a9e14f3b51a99c8f6d7fe5bf75f3c2547be4c21#3c2cbf16e8cccefeacd37370683c452d92d42eff"
-  integrity sha512-qwCWkwMxxEB8FNDa/wq+K/ddwLiUvhftv9/07rQRlpbWGI3ELpqEaXysI0PYCWQbh8E5vtqbKO+nWblmuYD6+Q==
+"@moosty/dao-storybook@^0.1.70":
+  version "0.1.70"
+  resolved "https://npm.pkg.github.com/download/@moosty/dao-storybook/0.1.70/53bd494e545bb582e4b72857c3ff5ba171b4c4148e0630cb5818b934d96e1015#a45d325631fa79ba2cbf59bd0d02c66596d5127f"
+  integrity sha512-AJCnNL0fWHEZ+ILjxZzM17GL8jrz/t+Y5T7F51tCKhn14v9UDNLAty3IvzgqO77GE/q8FzevewOaerx8OsFfOg==
   dependencies:
     "@craco/craco" "^6.1.1"
     "@headlessui/react" "^1.0.0"

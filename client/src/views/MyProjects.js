@@ -117,14 +117,13 @@ export const MyProjects = ({account, setModal, filters, visible}) => {
       }
     })
   }
-const onRefund = async (project) => {
+  const onRefund = async (project) => {
     const client = await getClient
     const fee = await createTransaction({
       moduleId: 3510,
       assetId: 5,
       assets: {
         crowdfund: Buffer.from(project.id, 'hex'),
-        message: ".",
       },
       account,
       client,
@@ -134,36 +133,11 @@ const onRefund = async (project) => {
       type: "transactionConfirm",
       address: account.address,
       name: account.username,
-      transactionType: "crowd:claim",
+      transactionType: "crowd:refund",
       fee: `${fee} LSK`,
       ctaButton: {
         label: "Confirm",
-        onClick: () => onSubmitClaim(project)
-      }
-    })
-  }
-const onCancel = async (project) => {
-    const client = await getClient
-    const fee = await createTransaction({
-      moduleId: 3510,
-      assetId: 4,
-      assets: {
-        crowdfund: Buffer.from(project.id, 'hex'),
-        message: ".",
-      },
-      account,
-      client,
-      getFee: true,
-    })
-    setModal({
-      type: "transactionConfirm",
-      address: account.address,
-      name: account.username,
-      transactionType: "crowd:claim",
-      fee: `${fee} LSK`,
-      ctaButton: {
-        label: "Confirm",
-        onClick: () => onSubmitClaim(project)
+        onClick: () => onSubmitRefund(project)
       }
     })
   }
@@ -284,6 +258,42 @@ const onCancel = async (project) => {
       setModal({type: "transactionResult", text: result.message, state: transactionStates.error})
     }
   }
+  const onSubmitRefund = async (project) => {
+    setModal({
+      type: "transactionResult",
+      text: `Submitting transaction, this can take a few seconds.`,
+      state: transactionStates.pending,
+    })
+    const client = await getClient;
+    const result = await createTransaction({
+      moduleId: 3510,
+      assetId: 5,
+      assets: {
+        crowdfund: Buffer.from(project.id, 'hex'),
+      },
+      account,
+      client,
+    })
+    if (result.status) {
+      const findTransaction = async () => {
+        try {
+          await client.transaction.get(Buffer.from(result.message.transactionId, 'hex'))
+          setModal({
+            type: "transactionResult",
+            text: `Your refund was successfully`,
+            state: transactionStates.confirmed
+          })
+          history.push('/my-projects')
+        } catch (e) {
+          setTimeout(async () => await findTransaction(), 1000)
+        }
+      }
+      await findTransaction()
+
+    } else {
+      setModal({type: "transactionResult", text: result.message, state: transactionStates.error})
+    }
+  }
 
   return <div>
     <Container
@@ -294,9 +304,8 @@ const onCancel = async (project) => {
         <Typography className="" type="body" Element="span">Your currently running crowdfundprojects.</Typography>
       </div>
       <div className="flex flex-row flex-wrap space-x-4 space-y-4">
-        {account && projects?.filter(project => project.owner === account.address && (project.state === crowdFundStates.PREVIEW || project.state === crowdFundStates.OPEN))
+        {account && projects?.filter(project => project.owner.address === account.address && (project.state === crowdFundStates.PREVIEW || project.state === crowdFundStates.OPEN))
           .map((project, i) => {
-              console.log(project)
               return <div key={project.id} className={i === 0 && "ml-5 mt-4"}>
                 <CrowdCardContainer
                   {...project}
@@ -317,31 +326,46 @@ const onCancel = async (project) => {
       </div>
       <div className="flex flex-col flex-wrap space-x-4 space-y-4">
         <AccountProjectList>
-          {account && projects?.filter(project => project.owner === account.address && (project.state !== crowdFundStates.PREVIEW && project.state !== crowdFundStates.OPEN && project.state !== crowdFundStates.CANCELED && project.state !== crowdFundStates.FAILED && project.state !== crowdFundStates.ENDED)).map((project) => {
-            const lastClaim = project?.claims?.length > 0 && project?.claims.reduce((acc, claim) => acc > claim.period ? acc : claim.period, 0)
-            console.log(project, lastClaim, height)
-
-            return <AccountProjectSingleItem
-              gradient
-              {...project}
-              userRole={userRoles.OWNER}
-              lastHeight={height}
-              onClickRegister={() => setModal({
-                type: "registerStart",
-                project: {
-                  ...project,
-                  onClickRegister: (date) => onRegister(date, project),
-                },
-              })}
-              claimed={lastClaim === project.periods}
-              onClickClaimOwner={() => setModal({
-              type: "claim",
-              project: {
-                ...project,
-                onClickClaim: () => onClaim(project),
-              },
-            })}
-            />}
+          {account && projects?.filter(project => project.owner.address === account.address && (project.state !== crowdFundStates.PREVIEW && project.state !== crowdFundStates.OPEN && project.state !== crowdFundStates.CANCELED && project.state !== crowdFundStates.FAILED && project.state !== crowdFundStates.ENDED)).map((project) => {
+              const lastClaim = project?.claims?.length > 0 && project?.claims.reduce((acc, claim) => acc > claim.period ? acc : claim.period, 0)
+            console.log(project)
+              return <AccountProjectSingleItem
+                gradient
+                {...project}
+                targetAmount={project.budget}
+                userRole={userRoles.OWNER}
+                lastHeight={height}
+                onClickRegister={() => setModal({
+                  type: "registerStart",
+                  project: {
+                    ...project,
+                    onClickRegister: (date) => onRegister(date, project),
+                  },
+                })}
+                claimed={lastClaim === project.periods}
+                onClickClaimOwner={() => setModal({
+                  type: "claim",
+                  project: {
+                    ...project,
+                    onClickClaim: () => onClaim(project),
+                  },
+                })}
+                onClickClaim={() => setModal({
+                  type: "refund",
+                  project: {
+                    ...project,
+                    onClickRefund: () => onRefund(project),
+                  },
+                })}
+                onClickCancel={() => setModal({
+                  type: "cancel",
+                  project: {
+                    ...project,
+                    onClickCancel: () => onRefund(project)
+                  }
+                })}
+              />
+            }
           )}
         </AccountProjectList>
       </div>
@@ -359,6 +383,8 @@ const onCancel = async (project) => {
           return <AccountProjectSingleItem
             gradient
             {...project}
+            targetAmount={project.budget}
+            noRefund={project.budget === 0 || project.refunds?.find(refund => refund.backer === account.address)}
             userRole={userRoles.BACKER}
             lastHeight={height}
             onClickRegister={() => setModal({
@@ -380,14 +406,14 @@ const onCancel = async (project) => {
               type: "refund",
               project: {
                 ...project,
-                onClickClaim: () => onRefund(project),
+                onClickRefund: () => onRefund(project),
               },
             })}
             onClickCancel={() => setModal({
               type: "cancel",
               project: {
                 ...project,
-                onClickCancel: () => onCancel(project)
+                onClickCancel: () => onRefund(project)
               }
             })}
             onClickVote={() => setModal({
@@ -411,14 +437,16 @@ const onCancel = async (project) => {
       </div>
       <div className="flex flex-col flex-wrap space-x-4 space-y-4">
         <AccountProjectList>
-          {account && projects?.filter(project => project.owner === account.address && (project.state === crowdFundStates.CANCELED || project.state === crowdFundStates.FAILED || project.state === crowdFundStates.ENDED)).map((project) => {
-            const lastClaim = project?.claims?.length > 0 && project?.claims.reduce((acc, claim) => acc > claim.period ? acc : claim.period, 0)
-            console.log(lastClaim, project.claims)
-            return <AccountProjectSingleItem
+          {account && projects?.filter(project => project.owner.address === account.address && (project.state === crowdFundStates.CANCELED || project.state === crowdFundStates.FAILED || project.state === crowdFundStates.ENDED)).map((project) => {
+              const lastClaim = project?.claims?.length > 0 && project?.claims.reduce((acc, claim) => acc > claim.period ? acc : claim.period, 0)
+              console.log(lastClaim, project.claims)
+              return <AccountProjectSingleItem
                 gradient
                 {...project}
                 userRole={userRoles.OWNER}
                 lastHeight={height}
+                targetAmount={project.budget}
+                noRefund={project.budget === 0 || project.refunds?.find(refund => refund.backer === account.address)}
                 onClickRegister={() => setModal({
                   type: "registerStart",
                   project: {
@@ -433,6 +461,20 @@ const onCancel = async (project) => {
                     ...project,
                     onClickClaim: () => onClaim(project),
                   },
+                })}
+                onClickClaim={() => setModal({
+                  type: "refund",
+                  project: {
+                    ...project,
+                    onClickRefund: () => onRefund(project),
+                  },
+                })}
+                onClickCancel={() => setModal({
+                  type: "cancel",
+                  project: {
+                    ...project,
+                    onClickCancel: () => onRefund(project)
+                  }
                 })}
               />
             }

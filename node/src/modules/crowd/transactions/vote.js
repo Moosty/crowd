@@ -58,13 +58,14 @@ export class Vote extends BaseAsset {
         `You already voted this period`
       )
     }
+    if (currentVoting) {
+      currentVoting.votes.push({
+        backer: transaction.senderAddress,
+        vote: asset.vote,
+      })
+    }
 
-    const updatedVoting = currentVoting ? {
-        ...currentVoting, votes: currentVoting.votes.push({
-          backer: transaction.senderAddress,
-          vote: asset.vote,
-        })
-      } :
+    const updatedVoting = currentVoting ? currentVoting :
       {
         period: currentPeriod,
         votes: [{
