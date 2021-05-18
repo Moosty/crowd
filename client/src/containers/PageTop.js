@@ -3,15 +3,14 @@ import {Container, BreadCrumbs, Button} from "@moosty/dao-storybook";
 import {Filters} from "./Filters";
 import {useHistory, useLocation, useRouteMatch} from "react-router-dom";
 
-export const PageTop = ({updateFilters, filters}) => {
+export const PageTop = ({updateFilters, filters, changeToggle}) => {
   const history = useHistory();
   const location = useLocation();
   const [crumbs, setCrumbs] = useState([]);
   const [filtersHidden, setFiltersHidden] = useState(false);
+  const [toggleHidden, setToggleHidden] = useState(true);
   const matches = {
-    votings: useRouteMatch("/votings/:args"),
-    members: useRouteMatch("/members/:args"),
-    daos: useRouteMatch("/daos/:args"),
+    explore: useRouteMatch("/explore/:args"),
   }
 
   useEffect(() => {
@@ -27,7 +26,7 @@ export const PageTop = ({updateFilters, filters}) => {
 
     switch (pathname) {
       case "/explore":
-        setFiltersHidden(false);
+        setFiltersHidden(true);
         setCrumbs([
           {
             name: "Home",
@@ -38,6 +37,7 @@ export const PageTop = ({updateFilters, filters}) => {
             onClick: () => history.push("/explore"),
           }
         ])
+        setToggleHidden(true)
         break;
       case "/explore/:args":
         setFiltersHidden(true);
@@ -55,9 +55,10 @@ export const PageTop = ({updateFilters, filters}) => {
             onClick: () => history.push(location.pathname),
           },
         ])
+        setToggleHidden(true)
         break;
       case "/my-projects":
-        setFiltersHidden(false);
+        setFiltersHidden(true);
         setCrumbs([
           {
             name: "Home",
@@ -68,6 +69,7 @@ export const PageTop = ({updateFilters, filters}) => {
             onClick: () => history.push("/my-projects"),
           }
         ])
+        setToggleHidden(true)
         break;
       case "/create-crowdfund":
         setFiltersHidden(true);
@@ -85,15 +87,12 @@ export const PageTop = ({updateFilters, filters}) => {
             onClick: () => history.push("/create-crowdfund"),
           },
         ])
+        setToggleHidden(true)
         break;
       default:
-        setFiltersHidden(false);
-        setCrumbs([
-          {
-            name: "Home",
-            onClick: () => history.push("/"),
-          },
-        ])
+        setFiltersHidden(true);
+        setCrumbs([])
+        setToggleHidden(true)
         break;
     }
   }, [location]);
@@ -101,6 +100,6 @@ export const PageTop = ({updateFilters, filters}) => {
   return (<Container className="flex flex-row my-4 ">
     <BreadCrumbs crumbs={crumbs} className="flex-start w-full"/>
     <Filters selectedItems={filters} updateFilters={updateFilters} hidden={filtersHidden} className="flex flex-row justify-end w-full" />
-    <Button label="Toggle View" />
+    {!toggleHidden && <Button label="Toggle View" onClick={changeToggle} />}
   </Container>)
 }

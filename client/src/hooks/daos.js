@@ -11,15 +11,15 @@ export const useDaos = () => {
 
   useEffect(() => {
     const getDaos = async () => {
-      const client = await getClient;
-      const dai = await client.invoke("dao:getAllDaos", {limit: 10000, offset: 0});
-      if (dai?.meta?.count > 0) {
-        setDaos(dai.data)
-        if (account && account?.address) {
-          console.log(dai.data)
-          setUserDaos(dai.data.filter(dao => dao.members.findIndex(m => m.id === account.address) > -1))
-        }
-      }
+      // const client = await getClient;
+      // const dai = await client.invoke("dao:getAllDaos", {limit: 10000, offset: 0});
+      // if (dai?.meta?.count > 0) {
+      //   setDaos(dai.data)
+      //   if (account && account?.address) {
+      //     console.log(dai.data)
+      //     setUserDaos(dai.data.filter(dao => dao.members.findIndex(m => m.id === account.address) > -1))
+      //   }
+      // }
     }
     getDaos()
   }, [account, height])

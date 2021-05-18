@@ -7,7 +7,7 @@ import {
   Modal,
   ResultTransactionModal,
   Typography,
-
+  BackProjectModal,
 } from '@moosty/dao-storybook';
 import { ModalTemplate } from '@moosty/dao-storybook/dist/stories/modals/ModalTemplate'
 
@@ -77,7 +77,7 @@ export const ModalContainer = ({currentOpen, setCurrentOpen, externalError, ctaL
     onClose={() => setCurrentOpen(null)}
 
   >
-    <ModalTemplate
+    {(currentOpen?.type !== 'back' && currentOpen?.type !== 'claim' && currentOpen?.type !== 'registerStart' && currentOpen?.type !== 'vote' ) && <ModalTemplate
       cancelLabel={cancelLabel}
       ctaButton={(currentOpen === 'login' || currentOpen === 'register' || currentOpen?.type === "transactionConfirm") && {
         disabled: disabledCTA || ctaLoading,
@@ -132,6 +132,16 @@ export const ModalContainer = ({currentOpen, setCurrentOpen, externalError, ctaL
       state={currentOpen.state}
       text={currentOpen.text}
     />}
-    </ModalTemplate>
+
+    </ModalTemplate>}
+    {(currentOpen?.type === 'back' || currentOpen?.type === 'claim' || currentOpen?.type === 'vote' || currentOpen?.type === 'registerStart') && <BackProjectModal
+      {...currentOpen.project}
+      iconCancel
+      onClose={() => setCurrentOpen(null)}
+      back={currentOpen?.type === 'back'}
+      register={currentOpen?.type === 'registerStart'}
+      vote={currentOpen?.type === 'vote'}
+      claim={currentOpen?.type === 'claim'}
+    />}
   </Modal>
 }

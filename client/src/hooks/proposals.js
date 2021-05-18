@@ -82,14 +82,14 @@ export const useProposals = () => {
 
   useEffect(() => {
     const getProposals = async () => {
-      const client = await getClient;
-      const chainProposals = await client.invoke("dao:getAllProposals", {limit: 100000, offset: 0});
-      if (chainProposals?.meta?.count > 0) {
-        setProposals(chainProposals.data)
-        if (account && account?.address) {
-          setInvitations(chainProposals.data.filter(invitationFilter))
-        }
-      }
+      // const client = await getClient;
+      // const chainProposals = await client.invoke("dao:getAllProposals", {limit: 100000, offset: 0});
+      // if (chainProposals?.meta?.count > 0) {
+      //   setProposals(chainProposals.data)
+      //   if (account && account?.address) {
+      //     setInvitations(chainProposals.data.filter(invitationFilter))
+      //   }
+      // }
     }
     getProposals()
   }, [account, height])

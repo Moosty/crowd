@@ -60,7 +60,7 @@ export class Claim extends BaseAsset {
       amount: allowedAmountPerPeriod,
     })
     foundCrowdfund.claims.push({
-      period: lastClaimedPeriod + 1,
+      period: foundCrowdfund.claims.length + 1,
       amount: allowedAmountPerPeriod,
     })
     foundCrowdfund.balance -= allowedAmountPerPeriod;

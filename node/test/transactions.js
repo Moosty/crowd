@@ -56,7 +56,7 @@ const run = async () => {
         goal: BigInt(100000000000), // 1k lsk
         periods: 12,
         site: "https://saveadoge.com",
-        image: 100010,
+        image: 3,
         category: 1,
         start: 5,
       })
@@ -71,7 +71,7 @@ const run = async () => {
         goal: BigInt(100000000000), // 1k lsk
         periods: 12,
         site: "https://saveadoge.com",
-        image: 100010,
+        image: 1,
         category: 1,
         start: 5,
       })

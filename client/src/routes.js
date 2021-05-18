@@ -8,16 +8,15 @@ import {useAuth} from "./hooks/auth";
 import {ContentSection, Footer, Hero} from "@moosty/dao-storybook";
 import {FooterAuthor, FooterItems} from "@moosty/dao-storybook/dist/fixtures/crowdfund/footerItems";
 import {projectImages} from "@moosty/dao-storybook/dist/shared/global.crowdfund";
+import {ContentContainer} from "./containers/Content";
+import {HeroContainer} from "./containers/Hero";
 
 export const Routes = () => {
   const history = useHistory();
   const [currentOpen, setCurrentOpen] = useState();
+  const [visible, setVisible] = useState()
   const [filtersFilter, setFilters] = useState();
   const {account, onLogin, onRegister, registerError, loadingSprinkler, onSignOut} = useAuth(setCurrentOpen);
-
-  useEffect(() => {
-    console.log(history)
-  }, [history])
 
   const updateFilters = (filter, value, filters) => {
     console.log(filter, filters, value)
@@ -29,6 +28,14 @@ export const Routes = () => {
 
   return (
     <Router>
+      <ModalContainer
+        currentOpen={currentOpen}
+        setCurrentOpen={setCurrentOpen}
+        onLogin={onLogin}
+        onRegister={onRegister}
+        externalError={registerError}
+        ctaLoading={loadingSprinkler}
+      />
       <NavBarContainer
         setModal={setCurrentOpen}
         onSignOut={() => onSignOut()}
@@ -36,65 +43,31 @@ export const Routes = () => {
         onLoginClick={() => setCurrentOpen("login")}
         onRegisterClick={() => setCurrentOpen("register")}
       />
-
       <div className="w-full  min-h-screen  flex flex-col">
-        <Hero
-          title="Lisk Crowd | A Regulated Crowdfund Platform"
-          subTitle="Regulate your crowdfund journey with Lisk Crowd!"
-          buttonLabel2="Start Crowdfund!"
-          onClickButton2={() => history.push("/create-crowdfund")}
-          onClickButton1={() => history.push("/explore")}
-          buttonLabel1="Explore"
-        />
+        <HeroContainer />
         <div className={"w-full mx-auto md:w-app flex-grow mb-10"}>
-          <PageTop updateFilters={updateFilters} filters={filtersFilter}/>
+          <PageTop updateFilters={updateFilters} filters={filtersFilter} changeToggle={() => setVisible(!visible)}/>
           <Switch>
-            <Route path={"/create-dao"}>
-              <Views.CreateDao account={account} setModal={setCurrentOpen}/>
+            <Route path={"/my-projects"}>
+              <Views.MyProjects filters={filtersFilter} account={account} setModal={setCurrentOpen}/>
             </Route>
-            <Route path={"/create-dao-proposal"}>
-              <Views.CreateVoting account={account} setModal={setCurrentOpen}/>
+            <Route path={"/create-crowdfund"}>
+              <Views.CreateCrowdfund account={account} setModal={setCurrentOpen}/>
             </Route>
-            <Route path={"/daos"}>
-              <Views.Daos account={account}/>
-            </Route>
-            <Route path={"/members"}>
-              <Views.Members account={account} setModal={setCurrentOpen}/>
-            </Route>
-            <Route path={"/votings/:args"}>
-              <Views.Home filters={filtersFilter} account={account} setModal={setCurrentOpen}/>
-            </Route>
-            <Route path={"/votings"}>
-              <Views.Home filters={filtersFilter} account={account} setModal={setCurrentOpen}/>
+            <Route path={"/explore"}>
+              <Views.Explore filters={filtersFilter} account={account} setModal={setCurrentOpen}/>
             </Route>
             <Route path={"/"}>
-              <Views.Home filters={filtersFilter} account={account} setModal={setCurrentOpen}/>
+              <Views.Home filters={filtersFilter} account={account} setModal={setCurrentOpen} visible={visible}/>
             </Route>
           </Switch>
         </div>
-        <ContentSection
-          gradient
-          title="The New Way Of Crowdfunding"
-          subTitle="more transparency, more structure, more success. "
-          titleContent="What would you do?"
-          content="Dit is een stukje tekst.Dit is een stukje tekst.  Dit is een stukje tekst.  Dit is een stukje tekst. Dit is een stukje tekst.Dit is een stukje tekst.  Dit is een stukje tekst.  Dit is een stukje tekst.Dit is een stukje tekst.Dit is een stukje tekst.  Dit is een stukje tekst.  Dit is een stukje tekst.Dit is een stukje tekst.Dit is een stukje tekst.  Dit is een stukje tekst.  Dit is een stukje tekst.Dit is een stukje tekst.Dit is een stukje tekst.  Dit is een stukje tekst.  Dit is een stukje tekst.  "
-          image={projectImages[1]}
-          backgroundImage
-        />
+        <ContentContainer />
         <Footer
           author={FooterAuthor}
           items={FooterItems}
         />
       </div>
-
-      {/*{location === "/" && <ModalContainer*/}
-      {/*  currentOpen={currentOpen}*/}
-      {/*  setCurrentOpen={setCurrentOpen}*/}
-      {/*  onLogin={onLogin}*/}
-      {/*  onRegister={onRegister}*/}
-      {/*  externalError={registerError}*/}
-      {/*  ctaLoading={loadingSprinkler}*/}
-      {/*/>}*/}
     </Router>
   )
 }
